@@ -7,22 +7,27 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Textarea,
   useDisclosure,
 } from "@nextui-org/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { addDoc } from "firebase/firestore";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import ErrorMessage from "../../components/ErrorMessage";
-import { productCollectionRef } from "../../lib/firebase";
-import { useState } from "react";
+import { productsCollectionRef } from "../../lib/firebase";
 
 const productFormSchema = z.object({
-  name: z.string().min(2, "Name cannot be less than 2 characters"),
+  title: z.string().min(2, "Title cannot be less than 2 characters"),
   category: z.string().min(2, "Category cannot be less than 2 characters"),
   price: z.number().min(1),
   color: z.string().min(2, "Color cannot be less than 2 characters"),
+  brand: z.string().min(2, "Brand cannot be less than 2 characters"),
+  description: z
+    .string()
+    .min(2, "Description cannot be less than 2 characters"),
   imageUrl: z.string().url("Not a valid url"),
 });
 
@@ -34,14 +39,14 @@ function ProductFormModal() {
   const onSubmit = (values) => {
     setIsSubmitting(true);
 
-    toast.promise(addDoc(productCollectionRef, values), {
+    toast.promise(addDoc(productsCollectionRef, values), {
       loading: "Creating product...",
       success: () => {
         reset();
 
         onOpenChange();
 
-        queryCLient.invalidateQueries("products");
+        queryCLient.invalidateQueries("admin_products");
 
         setIsSubmitting(false);
 
@@ -63,13 +68,6 @@ function ProductFormModal() {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(productFormSchema),
-    defaultValues: {
-      name: "",
-      category: "",
-      price: 0,
-      color: "",
-      imageUrl: "",
-    },
   });
 
   return (
@@ -86,22 +84,41 @@ function ProductFormModal() {
                   Create a New Product
                 </ModalHeader>
                 <ModalBody>
-                  <Input {...register("name")} label="Name" />
-                  <ErrorMessage error={errors.name?.message} />
-                  <Input {...register("category")} label="Category" />
-                  <ErrorMessage error={errors.category?.message} />
-                  <Input
-                    label="Price"
-                    type="number"
-                    {...register("price", {
-                      valueAsNumber: true,
-                    })}
-                  />
-                  <ErrorMessage error={errors.price?.message} />
-                  <Input {...register("color")} label="Color" />
-                  <ErrorMessage error={errors.color?.message} />
-                  <Input {...register("imageUrl")} label="Image Url" />
+                  <Input {...register("title")} label="Title" />
+                  <ErrorMessage error={errors.title?.message} />
+                  <div className="flex w-full gap-2">
+                    <div className="flex w-1/2 flex-col gap-1">
+                      <Input
+                        label="Price"
+                        type="number"
+                        {...register("price", {
+                          valueAsNumber: true,
+                        })}
+                      />
+                      <ErrorMessage error={errors.price?.message} />
+                    </div>
+                    <div className="flex w-1/2 flex-col gap-1">
+                      <Input {...register("color")} label="Color" />
+                      <ErrorMessage error={errors.color?.message} />
+                    </div>
+                  </div>
+                  <div className="flex w-full gap-2">
+                    <div className="flex w-1/2 flex-col gap-1">
+                      <Input {...register("category")} label="Category" />
+                      <ErrorMessage error={errors.category?.message} />
+                    </div>
+                    <div className="flex w-1/2 flex-col gap-1">
+                      <Input {...register("brand")} label="Brand Name" />
+                      <ErrorMessage error={errors.brand?.message} />
+                    </div>
+                  </div>
+                  <Input {...register("imageUrl")} label="Image URL" />
                   <ErrorMessage error={errors.imageUrl?.message} />
+                  <Textarea
+                    {...register("description")}
+                    label="Description"
+                  ></Textarea>
+                  <ErrorMessage error={errors.description?.message} />
                 </ModalBody>
                 <ModalFooter>
                   <Button color="danger" variant="flat" onPress={onClose}>

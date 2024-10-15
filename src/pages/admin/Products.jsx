@@ -9,18 +9,18 @@ import {
   TableRow,
   Tooltip,
 } from "@nextui-org/react";
-import { EditIcon, Trash2 } from "lucide-react";
+import { EditIcon } from "lucide-react";
 import { useCallback } from "react";
 // import products from "../../../data.json";
-import ProductFormModal from "../../components/admin/ProductFormModal";
 import { useQuery } from "@tanstack/react-query";
-import { getDocs, query } from "firebase/firestore";
-import { productCollectionRef } from "../../lib/firebase";
+import { getDocs } from "firebase/firestore";
 import ProductDeleteModal from "../../components/admin/ProductDeleteModal";
+import ProductFormModal from "../../components/admin/ProductFormModal";
+import { productsCollectionRef } from "../../lib/firebase";
 
 const columns = [
   { name: "ID", uid: "id" },
-  { name: "NAME", uid: "name" },
+  { name: "TITLE", uid: "title" },
   { name: "CATEGORY", uid: "category" },
   { name: "PRICE", uid: "price" },
   { name: "COLOR", uid: "color" },
@@ -33,9 +33,9 @@ export default function AdminProductsPage() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["products"],
+    queryKey: ["admin_products"],
     queryFn: async () => {
-      const { docs } = await getDocs(productCollectionRef);
+      const { docs } = await getDocs(productsCollectionRef);
       const products = docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -79,21 +79,24 @@ function ProductsTable({ products }) {
     const cellValue = product[columnKey];
 
     switch (columnKey) {
-      case "name":
+      case "title":
         return (
           <div className="flex items-center gap-4">
             <Image src={product.imageUrl} className="size-12" />
-            <div className="text-lg">{product.name}</div>
+            <div className="text-lg">{product.title}</div>
           </div>
         );
+
+      case "price":
+        return <div>${product.price.toFixed(2)}</div>;
 
       case "actions":
         return (
           <div className="relative flex justify-center gap-2">
             <Tooltip content="Edit product">
-              <span className="cursor-pointer text-lg text-default-400 active:opacity-50">
+              {/* <span className="cursor-pointer text-lg text-default-400 active:opacity-50">
                 <EditIcon />
-              </span>
+              </span> */}
             </Tooltip>
             <ProductDeleteModal productId={product.id} />
           </div>

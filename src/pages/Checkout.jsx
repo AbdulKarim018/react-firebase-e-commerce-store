@@ -1,13 +1,16 @@
-import React, { useEffect, useMemo } from "react";
-import HeroSection from "../components/HeroSection";
-import { Button, Input, Select, SelectItem } from "@nextui-org/react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Button, Input, Select, SelectItem } from "@nextui-org/react";
+import { addDoc } from "firebase/firestore";
+import React, { useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
+import { toast } from "sonner";
+import { z } from "zod";
 import ErrorMessage from "../components/ErrorMessage";
+import HeroSection from "../components/HeroSection";
 import { useCart } from "../contexts/Cart";
 import { useUser } from "../contexts/User";
-import { Link } from "react-router-dom";
+import { ordersCollectionRef } from "../lib/firebase";
 
 const CheckoutFormSchema = z.object({
   firstName: z.string().trim().min(2, "First Name cannot be blank"),
@@ -25,24 +28,49 @@ const CheckoutFormSchema = z.object({
 });
 
 export default function Checkout() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { data: user, isAuthenticated } = useUser();
+  const { cart, cartPrice, clearCart } = useCart();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(CheckoutFormSchema),
+    defaultValues: {
+      firstName: user?.name.split(" ")[0],
+      lastName: user?.name.split(" ").slice(1).join(" "),
+      email: user?.email,
+    },
   });
 
   const onSubmit = (values) => {
+    setIsSubmitting(true);
     console.log(values);
+
+    toast.promise(
+      addDoc(ordersCollectionRef, {
+        userId: user.id,
+        ...values,
+      }),
+      {
+        loading: "Placing order...",
+        success: () => {
+          setIsSubmitting(false);
+          return "Order placed successfully";
+        },
+        error: () => {
+          setIsSubmitting(false);
+          return "Failed to place order";
+        },
+      },
+    );
   };
 
-  const { cart, cartPrice } = useCart();
-
-  const { isAuthenticated } = useUser();
-
   useEffect(() => {
-    // window.scrollTo(0, 0);
+    window.scrollTo(0, 0);
   }, []);
 
   const shippingCost = useMemo(() => (cartPrice > 150 ? 0 : 10), [cart]);
@@ -229,7 +257,7 @@ export default function Checkout() {
                 className="px-12 py-8 hover:bg-yellow-600 hover:text-white disabled:pointer-events-none disabled:opacity-50"
                 size="lg"
                 variant="bordered"
-                disabled={!isAuthenticated}
+                disabled={!isAuthenticated || isSubmitting}
               >
                 Place Order
               </Button>

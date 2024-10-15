@@ -6,7 +6,9 @@ import {
   PopoverTrigger,
   ScrollShadow,
 } from "@nextui-org/react";
+import { signOut } from "firebase/auth";
 import {
+  ListChecks,
   LogInIcon,
   LogOutIcon,
   ShoppingBagIcon,
@@ -17,19 +19,21 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import Logo from "../assets/furniro.webp";
 import { useCart } from "../contexts/Cart";
 import { useUser } from "../contexts/User";
-import { signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
-import { toast } from "sonner";
 
 export default function Header() {
+  const { data: user } = useUser();
+
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm">
       <div className="container mx-auto flex items-center justify-between px-4 py-4">
         <Link to="/" className="flex items-center">
           <img
-            src="/furniro.webp"
+            src={Logo}
             alt="Furniro Logo"
             width={40}
             height={40}
@@ -52,6 +56,14 @@ export default function Header() {
           </Link>
         </nav>
         <div className="flex items-center space-x-4">
+          {user && user.role === "admin" && (
+            <Link
+              to="/admin/products"
+              className="flex items-center gap-2 rounded-md bg-yellow-600 px-4 py-2 text-white hover:bg-yellow-700"
+            >
+              Go to Admin Panel
+            </Link>
+          )}
           <UserIcon />
           {/* <Search className="h-6 w-6 text-gray-600" /> */}
           {/* <Heart className="h-6 w-6 text-gray-600" /> */}
@@ -86,6 +98,14 @@ const UserIcon = () => {
             Logged in as <span className="font-bold">{user.email}</span>
           </div>
           <Button
+            disabled
+            variant="ghost"
+            size="sm"
+            className="mt-2 w-full disabled:pointer-events-none disabled:opacity-50"
+          >
+            <ListChecks size={20} /> My Orders
+          </Button>
+          <Button
             variant="ghost"
             size="sm"
             className="mt-2 w-full"
@@ -103,7 +123,7 @@ const UserIcon = () => {
 };
 
 const ShoppingCartIcon = () => {
-  const { cart, getNmbrOfItemsInCart, removeFromCart, clearCart, cartPrice } =
+  const { cart, getNumbrOfItemsInCart, removeFromCart, clearCart, cartPrice } =
     useCart();
 
   const navigate = useNavigate();
@@ -120,8 +140,8 @@ const ShoppingCartIcon = () => {
       <PopoverTrigger>
         <div className="cursor-pointer">
           <Badge
-            isInvisible={getNmbrOfItemsInCart() === 0}
-            content={getNmbrOfItemsInCart()}
+            isInvisible={getNumbrOfItemsInCart() === 0}
+            content={getNumbrOfItemsInCart()}
             color="warning"
             className="text-white"
           >

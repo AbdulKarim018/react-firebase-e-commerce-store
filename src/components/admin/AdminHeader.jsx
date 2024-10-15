@@ -1,4 +1,5 @@
 import {
+  Button,
   Navbar,
   NavbarBrand,
   NavbarContent,
@@ -6,12 +7,22 @@ import {
   NavbarMenu,
   NavbarMenuItem,
   NavbarMenuToggle,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from "@nextui-org/react";
 import React from "react";
 import { Link } from "react-router-dom";
+import Logo from "../../assets/furniro.webp";
+import { useUser } from "../../contexts/User";
+import { LogOutIcon, User } from "lucide-react";
+import { signOut } from "firebase/auth";
+import { auth } from "../../lib/firebase";
+import { toast } from "sonner";
 
 export default function AdminHeader() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const { data: user } = useUser();
 
   const menuItems = [
     {
@@ -29,7 +40,7 @@ export default function AdminHeader() {
         />
         <NavbarBrand>
           <img
-            src="https://furniro-kappa.vercel.app/furniro.webp"
+            src={Logo}
             alt="Furniro Logo"
             width={40}
             height={40}
@@ -46,7 +57,17 @@ export default function AdminHeader() {
           </Link>
         </NavbarItem>
       </NavbarContent>
-      <NavbarContent justify="end"></NavbarContent>
+      <NavbarContent justify="end">
+        {user && user.role === "admin" && (
+          <Link
+            to="/"
+            className="flex items-center gap-2 rounded-md bg-yellow-600 px-4 py-2 text-white hover:bg-yellow-700"
+          >
+            Go to Public View
+          </Link>
+        )}
+        <UserIcon />
+      </NavbarContent>
       <NavbarMenu>
         {menuItems.map((item, index) => (
           <NavbarMenuItem key={`${item.label}-${index}`}>
@@ -70,3 +91,33 @@ export default function AdminHeader() {
     </Navbar>
   );
 }
+
+const UserIcon = () => {
+  const { data: user } = useUser();
+
+  return (
+    <Popover placement="bottom-end">
+      <PopoverTrigger>
+        <User className="size-6 cursor-pointer text-gray-600" />
+      </PopoverTrigger>
+      <PopoverContent>
+        <div className="px-1 py-2">
+          <div className="text-small">
+            Logged in as <span className="font-bold">{user.email}</span>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="mt-2 w-full"
+            onClick={() => {
+              signOut(auth);
+              toast.success("Signed Out");
+            }}
+          >
+            <LogOutIcon size={20} /> Logout
+          </Button>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+};

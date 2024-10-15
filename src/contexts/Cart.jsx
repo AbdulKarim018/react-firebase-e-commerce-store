@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import ReactConfetti from "react-confetti";
 
 const CartContext = createContext(null);
 
@@ -26,11 +27,12 @@ export default function CartContextProvider({ children }) {
     setCart((prevCart) => prevCart.filter((p) => p.id !== productId));
   };
 
-  const getNmbrOfItemsInCart = () => {
-    return cart.reduce((acc, product) => acc + product.quantity, 0);
-  };
-
   const clearCart = () => setCart([]);
+
+  const getNumbrOfItemsInCart = () => {
+    const total = cart.reduce((acc, product) => acc + product.quantity, 0);
+    return total;
+  };
 
   const getCartPrice = () => {
     const total = cart.reduce(
@@ -48,8 +50,8 @@ export default function CartContextProvider({ children }) {
         cart,
         addToCart,
         removeFromCart,
-        getNmbrOfItemsInCart,
         clearCart,
+        getNumbrOfItemsInCart,
         getCartPrice,
         cartPrice,
       }}

@@ -1,8 +1,8 @@
+import { Spinner } from "@nextui-org/react";
 import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth, db } from "../lib/firebase";
-import { Spinner } from "@nextui-org/react";
-import { doc, getDoc } from "firebase/firestore";
 
 const UserContext = createContext();
 

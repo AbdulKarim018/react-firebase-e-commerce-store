@@ -11,8 +11,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { deleteDoc, doc } from "firebase/firestore";
 import { Trash2 } from "lucide-react";
 import React, { useState } from "react";
-import { db, productCollectionRef } from "../../lib/firebase";
 import { toast } from "sonner";
+import { db } from "../../lib/firebase";
 
 export default function ProductDeleteModal({ productId }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -38,7 +38,7 @@ export default function ProductDeleteModal({ productId }) {
       },
     });
 
-    await queryClient.invalidateQueries(["products"]);
+    await queryClient.invalidateQueries(["admin_products"]);
   };
 
   return (

@@ -59,14 +59,14 @@ export default function Register() {
     setIsSubmitting(true);
 
     toast.promise(registerUser(values.name, values.email, values.password), {
-      loading: "Logging in...",
+      loading: "Creating your account...",
       success: () => {
         setIsSubmitting(false);
         return "Registration Complete! Happy Shopping!";
       },
       error: () => {
         setIsSubmitting(false);
-        return "Invalid email or password";
+        return "An Error occured while creating your account";
       },
     });
 

@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { collection, getFirestore } from "firebase/firestore";
+import { addDoc, collection, getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCu08pN-UftmdeCnb7eANXGvZSuJroZfTg",
@@ -16,7 +16,15 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const productCollectionRef = collection(db, "products");
 const userCollectionRef = collection(db, "furniro_users");
+const productsCollectionRef = collection(db, "furniro_products");
+const ordersCollectionRef = collection(db, "furniro_orders");
 
-export { app, auth, db, productCollectionRef, userCollectionRef };
+export {
+  app,
+  auth,
+  db,
+  productsCollectionRef,
+  userCollectionRef,
+  ordersCollectionRef,
+};
