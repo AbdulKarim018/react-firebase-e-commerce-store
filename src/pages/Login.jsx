@@ -1,4 +1,10 @@
-import { Button, Input } from "@nextui-org/react";
+import {
+  Button,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../contexts/User";
@@ -9,6 +15,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import ErrorMessage from "../components/ErrorMessage";
+import { InfoIcon } from "lucide-react";
 
 const LoginSchema = z.object({
   email: z.string().email(),
@@ -61,7 +68,21 @@ export default function Login() {
 
   return (
     <div className="container mx-auto max-w-4xl">
-      <h1 className="text-3xl font-bold">Login</h1>
+      <div className="flex items-center gap-4">
+        <h1 className="text-3xl font-bold">Login</h1>
+        <Popover placement="right">
+          <PopoverTrigger>
+            <InfoIcon className="animate-bounce cursor-pointer" />
+          </PopoverTrigger>
+          <PopoverContent>
+            <div className="px-1 py-2">
+              <div className="text-small font-bold">Admin Credentials</div>
+              <p>Email: admin@furniro.com</p>
+              <p>Password: furniro_admin</p>
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
       <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
         <Input
           autoComplete="email"
