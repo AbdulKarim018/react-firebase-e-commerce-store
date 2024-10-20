@@ -29,6 +29,10 @@ export default function AdminHeader() {
       label: "Products",
       href: "products",
     },
+    {
+      label: "Orders",
+      href: "orders",
+    },
   ];
 
   return (
@@ -51,9 +55,12 @@ export default function AdminHeader() {
       </NavbarContent>
 
       <NavbarContent className="hidden gap-4 sm:flex" justify="center">
-        <NavbarItem>
+        <NavbarItem className="flex items-center gap-4">
           <Link color="foreground" to={"/admin/products"}>
             Products
+          </Link>
+          <Link color="foreground" to={"/admin/orders"}>
+            Orders
           </Link>
         </NavbarItem>
       </NavbarContent>

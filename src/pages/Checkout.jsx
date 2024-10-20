@@ -1,9 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Input, Select, SelectItem } from "@nextui-org/react";
-import { addDoc } from "firebase/firestore";
-import React, { useEffect, useMemo, useState } from "react";
+import { addDoc, serverTimestamp } from "firebase/firestore";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { z } from "zod";
 import ErrorMessage from "../components/ErrorMessage";
@@ -33,6 +33,8 @@ export default function Checkout() {
   const { data: user, isAuthenticated } = useUser();
   const { cart, cartPrice, clearCart } = useCart();
 
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -46,27 +48,42 @@ export default function Checkout() {
     },
   });
 
+  const createOrder = useCallback((userId, values) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await addDoc(ordersCollectionRef, {
+          userId,
+          ...values,
+          items: cart,
+          total: cartPrice,
+          status: "pending",
+          timestamp: serverTimestamp(),
+        });
+        clearCart();
+        navigate("/orders");
+        resolve(true);
+      } catch (error) {
+        console.log(error);
+        reject(false);
+      }
+    });
+  }, []);
+
   const onSubmit = (values) => {
     setIsSubmitting(true);
-    console.log(values);
+    // console.log(values);
 
-    toast.promise(
-      addDoc(ordersCollectionRef, {
-        userId: user.id,
-        ...values,
-      }),
-      {
-        loading: "Placing order...",
-        success: () => {
-          setIsSubmitting(false);
-          return "Order placed successfully";
-        },
-        error: () => {
-          setIsSubmitting(false);
-          return "Failed to place order";
-        },
+    toast.promise(createOrder(user.id, values), {
+      loading: "Placing order...",
+      success: () => {
+        setIsSubmitting(false);
+        return "Order placed successfully";
       },
-    );
+      error: () => {
+        setIsSubmitting(false);
+        return "Failed to place order";
+      },
+    });
   };
 
   useEffect(() => {
@@ -257,7 +274,7 @@ export default function Checkout() {
                 className="px-12 py-8 hover:bg-yellow-600 hover:text-white disabled:pointer-events-none disabled:opacity-50"
                 size="lg"
                 variant="bordered"
-                disabled={!isAuthenticated || isSubmitting}
+                disabled={!isAuthenticated || isSubmitting || cart.length === 0}
               >
                 Place Order
               </Button>

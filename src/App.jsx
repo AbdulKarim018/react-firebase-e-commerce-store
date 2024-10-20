@@ -13,6 +13,7 @@ import Header from "./components/Header";
 import CartContextProvider from "./contexts/Cart";
 import UserContextProvider, { useUser } from "./contexts/User";
 import AdminProductsPage from "./pages/admin/Products";
+import AdminOrdersPage from "./pages/admin/Orders";
 import Checkout from "./pages/Checkout";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -20,6 +21,8 @@ import NotFound from "./pages/NotFound";
 import Product from "./pages/Product";
 import Register from "./pages/Register";
 import Shop from "./pages/Shop";
+import Orders from "./pages/Orders";
+import OrderDetails from "./pages/OrderDetails";
 
 function App() {
   const queryClient = new QueryClient();
@@ -37,6 +40,8 @@ function App() {
                   <Route path="shop" element={<Shop />} />
                   <Route path="/shop/:id" element={<Product />} />
                   <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/orders" element={<Orders />} />
+                  <Route path="/orders/:id" element={<OrderDetails />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="*" element={<NotFound />} />
@@ -44,7 +49,7 @@ function App() {
 
                 <Route path="admin" element={<AdminLayout />}>
                   <Route path="products" element={<AdminProductsPage />} />
-                  {/* <Route path="orders" element={<Orders />} /> */}
+                  <Route path="orders" element={<AdminOrdersPage />} />
                 </Route>
               </Routes>
             </BrowserRouter>

@@ -2,11 +2,10 @@ import { Button, Skeleton } from "@nextui-org/react";
 import { useQuery } from "@tanstack/react-query";
 import { doc, getDoc } from "firebase/firestore";
 import { ArrowLeft, ShoppingCartIcon } from "lucide-react";
+import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCart } from "../contexts/Cart";
 import { productsCollectionRef } from "../lib/firebase";
-import { useEffect, useMemo } from "react";
-import { sleep } from "../lib/utils";
 
 export default function Product() {
   const params = useParams();

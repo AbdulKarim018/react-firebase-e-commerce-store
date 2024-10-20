@@ -97,14 +97,12 @@ const UserIcon = () => {
           <div className="text-small">
             Logged in as <span className="font-bold">{user.email}</span>
           </div>
-          <Button
-            disabled
-            variant="ghost"
-            size="sm"
-            className="mt-2 w-full disabled:pointer-events-none disabled:opacity-50"
+          <Link
+            to="/orders"
+            className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg border-3 py-1 hover:bg-gray-300"
           >
             <ListChecks size={20} /> My Orders
-          </Button>
+          </Link>
           <Button
             variant="ghost"
             size="sm"
